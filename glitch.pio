@@ -1,0 +1,50 @@
+; Copyright (c) 2022 Balázs Triszka <balika011@gmail.com>
+;
+; This program is free software; you can redistribute it and/or modify it
+; under the terms and conditions of the GNU General Public License,
+; version 2, as published by the Free Software Foundation.
+;
+; This program is distributed in the hope it will be useful, but WITHOUT
+; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+; more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+.program glitch
+.side_set 2
+
+	pull                        side 0x1
+	mov x, osr                  side 0x1
+	pull                        side 0x1
+	mov y, osr                  side 0x1
+
+wait_for_post_loop:
+	wait 1 GPIO 15              side 0x1
+	wait 0 GPIO 15              side 0x1
+	jmp x-- wait_for_post_loop  side 0x1
+
+delay_pll:
+	jmp y-- delay_pll           side 0x1
+
+	pull                        side 0x3
+	mov x, osr                  side 0x3
+	pull                        side 0x3
+	mov y, osr                  side 0x3
+
+	wait 1 GPIO 15              side 0x3
+
+delay_rst: ; 
+	jmp x-- delay_rst           side 0x3
+
+hold_rst:
+	jmp y-- hold_rst            side 0x2
+
+	pull                        side 0x3
+	mov x, osr                  side 0x3
+
+hold_pll:
+	jmp x-- hold_pll            side 0x3
+
+	push                        side 0x1
